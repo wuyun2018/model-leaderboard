@@ -1,9 +1,9 @@
 name: daily-refresh
 
-# 每天 UTC 22:17（北京时间 06:17）跑一次；也可手动触发
+# 每天 UTC 23:00（北京时间 07:00）跑一次；也可手动触发
 on:
   schedule:
-    - cron: '17 22 * * *'
+    - cron: '0 23 * * *'
   workflow_dispatch:
 
 permissions:
