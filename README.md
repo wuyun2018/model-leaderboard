@@ -115,7 +115,7 @@ AA 的细分指标（`scicode` / `gpqa` / `lcr` / `itbenchSre`…）**Data API �
 1. 建仓库，推上去
 2. Settings → Secrets → 新增 `OPENROUTER_API_KEY`
 3. Settings → Pages → Source 选 **GitHub Actions**
-4. 已带 `.github/workflows/daily.yml`：每天 UTC 22:17（北京 06:17）抓数据 → 提交 → 发布
+4. 已带 `.github/workflows/daily.yml`：每天 UTC 23:00（北京 07:00）抓数据 → 提交 → 发布
 
 产物只包含 4 个静态文件，`local.js` 不会上传（`.gitignore` 已排除），页面自动无高亮、不泄露你的 provider 清单。
 
