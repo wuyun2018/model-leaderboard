@@ -1,0 +1,72 @@
+name: daily-refresh
+
+# 每天 UTC 22:17（北京时间 06:17）跑一次；也可手动触发
+on:
+  schedule:
+    - cron: '17 22 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: daily-refresh
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      # 纯标准库，无需 pip install
+      - name: Fetch Artificial Analysis
+        run: python3 fetch_aa.py
+
+      - name: Fetch OpenRouter Data API
+        env:
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+        run: python3 fetch_openrouter.py
+
+      - name: Build
+        run: python3 build.py
+
+      - name: Commit if changed
+        run: |
+          git config user.name  "leaderboard-bot"
+          git config user.email "bot@users.noreply.github.com"
+          if [ -n "$(git status --porcelain)" ]; then
+            git add -A
+            git commit -m "chore: daily refresh $(date -u +%F)"
+            git push
+          else
+            echo "no changes"
+          fi
+
+      # 只发布静态页面，别把脚本和原始快照一起公开
+      - name: Stage site
+        run: |
+          mkdir -p _site
+          cp index.html manual.js realdata.js auto.js _site/
+
+      - name: Upload site artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: refresh
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b0f14">
+<title>全球模型排行榜 · 2026-10-15</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:#0b0f14;color:#e6edf3;font:14px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;padding-bottom:40px}
+header{padding:20px 16px 12px;background:linear-gradient(160deg,#111a26 0%,#0b0f14 100%);border-bottom:1px solid #1c2633;position:sticky;top:0;z-index:20}
+h1{margin:0;font-size:19px;letter-spacing:-.3px}
+h1 span{color:#58a6ff}
+.sub{margin:6px 0 0;font-size:11.5px;color:#7d8590}
+.tabs{display:flex;gap:7px;overflow-x:auto;padding:10px 16px 12px;background:#0b0f14;border-bottom:1px solid #1c2633;position:sticky;top:0;z-index:19;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:0 0 auto;padding:7px 13px;border-radius:16px;background:#161b22;border:1px solid #21262d;color:#9ba3ae;font-size:12.5px;white-space:nowrap;cursor:pointer;transition:.15s}
+.tab.on{background:#1f6feb;border-color:#1f6feb;color:#fff;font-weight:600}
+main{padding:16px}
+.lead{font-size:12.5px;color:#8b949e;margin:0 0 14px;padding-left:10px;border-left:3px solid #1f6feb;line-height:1.6}
+.card{background:#11161d;border:1px solid #1c2633;border-radius:12px;overflow:hidden;margin-bottom:14px}
+.card>h3{margin:0;padding:11px 13px;font-size:13px;font-weight:600;color:#c9d1d9;background:#151b24;border-bottom:1px solid #1c2633}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th{text-align:left;padding:8px 10px;color:#6e7681;font-weight:500;font-size:11px;background:#0f141a;border-bottom:1px solid #1c2633}
+td{padding:9px 10px;border-bottom:1px solid #161b22;vertical-align:top}
+tr:last-child td{border-bottom:none}
+td.rk{width:26px;color:#6e7681;font-variant-numeric:tabular-nums}
+td.mn{font-weight:500;color:#e6edf3}
+td.org{color:#8b949e;font-size:11.5px;white-space:nowrap}
+td.sc{text-align:right;font-variant-numeric:tabular-nums;font-weight:600;color:#58a6ff;white-space:nowrap}
+tr.gold td.sc{color:#e3b341}
+tr.gold td.mn::before{content:"★ ";color:#e3b341}
+tr.mine{background:rgba(31,111,235,.10)}
+tr.mine td.mn::after{content:" · 你有";font-size:10px;color:#1f6feb;font-weight:600;margin-left:5px}
+.pick{background:#11161d;border:1px solid #1c2633;border-radius:12px;padding:13px;margin-bottom:10px}
+.pick .t{font-size:12px;color:#8b949e;margin-bottom:7px}
+.pick .f{font-size:16px;font-weight:700;color:#58a6ff;letter-spacing:-.2px}
+.pick .a{font-size:12px;color:#8b949e;margin-top:3px}
+.pick .a b{color:#c9d1d9;font-weight:600}
+.pick .w{font-size:11.5px;color:#6e7681;margin-top:7px;padding-top:7px;border-top:1px dashed #21262d}
+footer{padding:16px;font-size:11px;color:#565e68;line-height:1.7;border-top:1px solid #1c2633;margin-top:10px}
+.legend{font-size:11px;color:#6e7681;margin:-4px 0 12px}
+.legend b{color:#58a6ff}
+</style>
+</head>
+<body>
+<header>
+  <h1>全球模型排行榜 <span>·</span> 按用途分类</h1>
+  <p class="sub">数据日期 <span id="d"></span> · 源：Artificial Analysis（<span id="n"></span> 个活跃模型）+ OpenRouter 真实用量 + Design Arena</p>
+</header>
+<div class="tabs" id="tabs"></div>
+<main id="main"></main>
+<footer>
+  <b>读榜须知</b><br>
+  ① 带 (Max)/(Xhigh)/(High) 的是同一模型的不同推理强度档位，分数差异很大，别混为一谈。<br>
+  ② 带 <b>*</b> 的分数是 Artificial Analysis 的估算值，非官方实测。<br>
+  ③ 🟢 代表开放权重（可自部署）。<br>
+  ④ "智能指数"是 10 项基准加权综合分；单一维度任务请看对应分类，别只看总分。<br>
+  ⑤ 真实用量榜反映生产环境实际选择，和分数榜经常对不上——便宜和快也是竞争力。
+</footer>
+<script src="manual.js?v=1792413976"></script>
+<script src="realdata.js?v=1792413976"></script>
+<script src="local.js?v=1792413976"></script>
+
+<script src="auto.js?v=1792413976"></script>
+<script>
+const CATS = [PICK_CAT, ...AUTO_CATS, ...REAL_CATS, DESIGN_CAT];
+const $ = s => document.querySelector(s);
+
+// 归一化：全部压成小写字母数字，消除空格/连字符/点的差异
+const norm = s => s.toLowerCase().replace(/[^a-z0-9]/g, '');
+const LOCAL_NORM = [];
+const LOCAL_SAFE = (typeof LOCAL === 'undefined' ? {} : LOCAL);   // local.js 不存在时自动降级
+Object.entries(LOCAL_SAFE).forEach(([prov, arr]) => arr.forEach(n => LOCAL_NORM.push(norm(n))));
+
+function isMine(name){
+  const n = norm(name);
+  return LOCAL_NORM.some(l => l.length >= 5 ? n.includes(l) : (n === l || n.startsWith(l)));
+}
+
+function esc(s){ return String(s).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
+
+function table(cols, rows, rank){
+  let h = '<table><thead><tr>';
+  if(rank) h += '<th></th>';
+  cols.forEach(c => h += `<th>${esc(c)}</th>`);
+  h += '</tr></thead><tbody>';
+  rows.forEach((r,i) => {
+    const name = r[0];
+    const cls = i < 3 ? 'gold' : (isMine(name) ? 'mine' : '');
+    h += `<tr class="${cls}">`;
+    if(rank) h += `<td class="rk">${i+1}</td>`;
+    r.forEach((cell,j) => {
+      const last = j === r.length - 1;
+      const c = j === 0 ? 'mn' : (last && /[%$]|^\d+([.,]\d+)?[Mk]?$/.test(String(cell)) ? 'sc' : (j === 1 ? 'org' : ''));
+      h += `<td class="${c}">${esc(cell)}</td>`;
+    });
+    h += '</tr>';
+  });
+  return h + '</tbody></table>';
+}
+
+function render(id){
+  const cat = CATS.find(c => c.id === id);
+  const m = $('#main');
+  let h = `<p class="lead">${esc(cat.desc)}</p>`;
+
+  if(cat.kind === 'pick'){
+    cat.picks.forEach(p => {
+      h += `<div class="pick">
+        <div class="t">${esc(p.task)}</div>
+        <div class="f">${esc(p.first)}</div>
+        <div class="a">备选 <b>${esc(p.alt)}</b></div>
+        <div class="w">${esc(p.why)}</div>
+      </div>`;
+    });
+  } else if(cat.kind === 'list'){
+    h += `<p class="legend">★ 前三 · <b>蓝色高亮</b> = 你本地已配置</p>`;
+    h += `<div class="card">${table(cat.cols, cat.rows, true)}</div>`;
+  } else {
+    h += `<p class="legend">★ 前三 · <b>蓝色高亮</b> = 你本地已配置</p>`;
+    cat.groups.forEach(g => {
+      h += `<div class="card"><h3>${esc(g.title)}</h3>${table(g.cols, g.rows, true)}</div>`;
+    });
+  }
+  m.innerHTML = h;
+  window.scrollTo({top:0,behavior:'instant'});
+}
+
+const tabs = $('#tabs');
+CATS.forEach((c,i) => {
+  const b = document.createElement('div');
+  b.className = 'tab' + (i===0?' on':'');
+  b.textContent = c.name;
+  b.onclick = () => {
+    [...tabs.children].forEach(x => x.classList.remove('on'));
+    b.classList.add('on');
+    render(c.id);
+  };
+  tabs.appendChild(b);
+});
+$('#d').textContent = DATA_DATE;
+$('#n').textContent = MODEL_COUNT;
+document.title = '全球模型排行榜 · ' + DATA_DATE;
+render(CATS[0].id);
+</script>
+</body>
+</html>

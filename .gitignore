@@ -1,0 +1,17 @@
+# 私有：各 provider 的模型清单，只在本机使用
+local.js
+
+# 运行日志
+logs/
+
+# 抓取中间产物
+/tmp/aa_new.html
+*.bak
+*.off
+.env
+
+# 抓取快照，Actions 每次重新生成（避免每天提交 400KB）
+aa_models_raw.json
+
+# 发布脚本（含 token 参数，不随仓库走）
+push.sh
