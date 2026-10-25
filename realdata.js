@@ -1,7 +1,7 @@
 /* 自动生成 —— 由 fetch_openrouter.py 从 OpenRouter Data API 构建
-   数据截止 2026-10-24（周=最近7个完整日，月=最近30日） · 生成 2026-10-25 12:33
+   数据截止 2026-10-24（周=最近7个完整日，月=最近30日） · 生成 2026-10-25 19:14
    注：rankings-daily 每日只给 top50 模型，跨日合计会漏掉长尾
-   许可 CC BY 4.0 · Source: OpenRouter (openrouter.ai/rankings) as of 2026-10-25T12:33:54.893Z; Design Arena via OpenRouter */
+   许可 CC BY 4.0 · Source: OpenRouter (openrouter.ai/rankings) as of 2026-10-25T19:14:22.646Z; Design Arena via OpenRouter */
 
 const REAL_ASOF = "2026-10-24";
 const REAL = {
