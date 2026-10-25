@@ -228,7 +228,16 @@ CATS.append({
     ]
 })
 
+# 数据日期：优先读 fetch_aa.py 写的抓取时间，回退到当天
+import time as _t
+try:
+    _meta = json.load(open(os.path.join(HERE, 'aa_meta.json'), encoding='utf-8'))
+    DATA_DATE = _meta['fetched_at'][:10]
+except Exception:
+    DATA_DATE = _t.strftime('%Y-%m-%d')
+
 out = "/* 自动生成，请勿手改 —— 由 build.py 从 aa_models_raw.json 生成 */\n"
+out += f'const DATA_DATE = "{DATA_DATE}";\n'
 out += f"const MODEL_COUNT = {len([m for m in M if not m.get('deprecated')])};\n"
 out += "const AUTO_CATS = " + J(CATS) + ";\n"
 
