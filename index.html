@@ -26,14 +26,13 @@ th{text-align:left;padding-top:8px;padding-bottom:8px;color:#6e7681;font-weight:
    background:#0f141a;border-bottom:1px solid #1c2633;white-space:nowrap;vertical-align:middle;
    font-family:inherit;letter-spacing:0;-webkit-text-size-adjust:100%}
 th.c-num{text-align:right}
-td{padding-top:9px;padding-bottom:9px;border-bottom:1px solid #161b22;vertical-align:top;overflow-wrap:anywhere}
+td{padding-top:9px;padding-bottom:9px;border-bottom:1px solid #161b22;vertical-align:top;overflow-wrap:anywhere;word-break:break-word;line-height:1.35}
 tr:last-child td{border-bottom:none}
-td.rk{color:#6e7681;font-variant-numeric:tabular-nums;padding-right:4px}
-th.rk,td.rk{width:26px}
+td.rk,th.rk{color:#6e7681;font-variant-numeric:tabular-nums;text-align:right;padding-left:2px;padding-right:6px}
 th.c-num,td.sc{text-align:right}
 td.mn{font-weight:500;color:#e6edf3;min-width:0}
-td.org{color:#8b949e;font-size:11.5px;white-space:nowrap}
-td.sc{text-align:right;font-variant-numeric:tabular-nums;font-weight:600;color:#58a6ff;white-space:nowrap}
+td.org{color:#8b949e;font-size:11.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+td.sc{text-align:right;font-variant-numeric:tabular-nums;font-weight:600;color:#58a6ff;white-space:nowrap;font-size:11.5px}
 tr.gold td.sc{color:#e3b341}
 tr.gold td.mn::before{content:"★ ";color:#e3b341}
 tr.mine{background:rgba(31,111,235,.10)}
@@ -64,11 +63,11 @@ footer{padding:16px;font-size:11px;color:#565e68;line-height:1.7;border-top:1px 
   ④ "智能指数"是 10 项基准加权综合分；单一维度任务请看对应分类，别只看总分。<br>
   ⑤ 真实用量榜反映生产环境实际选择，和分数榜经常对不上——便宜和快也是竞争力。
 </footer>
-<script src="manual.js?v=1792929010"></script>
-<script src="realdata.js?v=1792929010"></script>
-<script src="local.js?v=1792929010"></script>
+<script src="manual.js?v=1792928026"></script>
+<script src="realdata.js?v=1792928026"></script>
+<script src="local.js?v=1792928026"></script>
 
-<script src="auto.js?v=1792929010"></script>
+<script src="auto.js?v=1792928026"></script>
 <script>
 const CATS = [PICK_CAT, ...AUTO_CATS, ...REAL_CATS, DESIGN_CAT];
 const $ = s => document.querySelector(s);
@@ -86,6 +85,18 @@ function isMine(name){
 
 function esc(s){ return String(s).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
 
+// 厂商名缩写：等分列宽后长名会截断，这里做保守缩写
+const ORG_SHORT = {
+  'Institute of Foundation Models': 'Inst. of Found.',
+  'Motif Technologies': 'Motif Tech',
+  'Sapiens AI': 'Sapiens',
+  'SpaceXAI': 'SpaceXAI'
+};
+function shortOrg(v){
+  const t = String(v == null ? '' : v).trim();
+  return ORG_SHORT[t] || t;
+}
+
 // 判定某一列是否为数字列：整列 ≥60% 的值带 %/$/数字 → 右对齐，表头同步右对齐
 function numCol(rows, j){
   if(!rows.length) return false;
@@ -98,13 +109,16 @@ function numCol(rows, j){
 }
 
 function table(cols, rows, rank){
-  const ncol = cols.length;
   // 每列对齐方式：第 0 列模型名左对齐，其余数字列右对齐
   const right = cols.map((c,j) => j === 0 ? false : (numCol(rows, j) || /token|数|变化|价格|分|率|ttft|吞吐|成本/i.test(c)));
 
+  // 列宽 = 按列数等分。序号列（若有）也参与等分，不再单占 26px，
+  // 这样「同样的列数」在所有板块里宽度完全一致，竖向扫视时列边界对得上。
+  const n = cols.length + (rank ? 1 : 0);
+  const w = (100 / n).toFixed(4) + '%';
+
   let h = '<table><colgroup>';
-  if(rank) h += '<col style="width:26px">';
-  cols.forEach(() => { h += '<col>'; });   // 列宽交给 table-layout:fixed 均分后再由内容撑开
+  for(let k = 0; k < n; k++) h += `<col style="width:${w}">`;
   h += '</colgroup><thead><tr>';
   if(rank) h += '<th class="rk"></th>';
   cols.forEach((c,j) => h += `<th class="${right[j] ? 'c-num' : ''}">${esc(c)}</th>`);
@@ -116,7 +130,8 @@ function table(cols, rows, rank){
     if(rank) h += `<td class="rk">${i+1}</td>`;
     r.forEach((cell,j) => {
       const c = j === 0 ? 'mn' : (right[j] ? 'sc' : (j === 1 ? 'org' : ''));
-      h += `<td class="${c}">${esc(cell)}</td>`;
+      const v = j === 1 ? shortOrg(cell) : cell;
+      h += `<td class="${c}">${esc(v)}</td>`;
     });
     h += '</tr>';
   });
