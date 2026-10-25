@@ -1,7 +1,7 @@
 /* 自动生成 —— 由 fetch_openrouter.py 从 OpenRouter Data API 构建
-   数据截止 2026-10-24（周=最近7个完整日，月=最近30日） · 生成 2026-10-25 12:02
+   数据截止 2026-10-24（周=最近7个完整日，月=最近30日） · 生成 2026-10-25 12:09
    注：rankings-daily 每日只给 top50 模型，跨日合计会漏掉长尾
-   许可 CC BY 4.0 · Source: OpenRouter (openrouter.ai/rankings) as of 2026-10-25T12:02:48.778Z; Design Arena via OpenRouter */
+   许可 CC BY 4.0 · Source: OpenRouter (openrouter.ai/rankings) as of 2026-10-25T12:09:16.548Z; Design Arena via OpenRouter */
 
 const REAL_ASOF = "2026-10-24";
 const REAL = {
@@ -498,7 +498,7 @@ const DESIGN = [
   [
     "Muse Wonder (max)",
     "Meta",
-    "1377"
+    "1376"
   ],
   [
     "Kimi K3",
@@ -511,14 +511,9 @@ const DESIGN = [
     "1358"
   ],
   [
-    "Kimi K3.1 Pro",
-    "Moonshotai",
-    "1356"
-  ],
-  [
     "Claude Sonnet 5.5",
     "Anthropic",
-    "1354"
+    "1355"
   ],
   [
     "Muse Spark 1.3 (xhigh)",
@@ -529,6 +524,11 @@ const DESIGN = [
     "Muse Spark 1.3 Max",
     "Meta",
     "1350"
+  ],
+  [
+    "Kimi K3.1 Pro",
+    "Moonshotai",
+    "1349"
   ],
   [
     "Claude Fable 5.1",
