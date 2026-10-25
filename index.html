@@ -12,10 +12,18 @@ header{padding:20px 16px 12px;background:linear-gradient(160deg,#111a26 0%,#0b0f
 h1{margin:0;font-size:19px;letter-spacing:-.3px}
 h1 span{color:#58a6ff}
 .sub{margin:6px 0 0;font-size:11.5px;color:#7d8590}
-.tabs{display:flex;gap:7px;overflow-x:auto;padding:10px 16px 12px;background:#0b0f14;border-bottom:1px solid #1c2633;position:sticky;top:0;z-index:19;scrollbar-width:none}
-.tabs::-webkit-scrollbar{display:none}
-.tab{flex:0 0 auto;padding:7px 13px;border-radius:16px;background:#161b22;border:1px solid #21262d;color:#9ba3ae;font-size:12.5px;white-space:nowrap;cursor:pointer;transition:.15s}
+.tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;
+  padding:10px 12px 11px;background:#0b0f14;border-bottom:1px solid #1c2633;
+  position:sticky;top:0;z-index:19}
+.tab{display:flex;align-items:center;justify-content:center;gap:4px;
+  padding:7px 4px;border-radius:9px;background:#161b22;border:1px solid #21262d;
+  color:#9ba3ae;font-size:11.5px;line-height:1.2;white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis;cursor:pointer;transition:.15s;
+  -webkit-tap-highlight-color:transparent;user-select:none}
+.tab:active{transform:scale(.97)}
 .tab.on{background:#1f6feb;border-color:#1f6feb;color:#fff;font-weight:600}
+.tab .em{font-size:12px;flex:0 0 auto}
+@media (max-width:340px){.tabs{grid-template-columns:repeat(2,minmax(0,1fr))}}
 main{padding:16px}
 .lead{font-size:12.5px;color:#8b949e;margin:0 0 14px;padding-left:10px;border-left:3px solid #1f6feb;line-height:1.6}
 .card{background:#11161d;border:1px solid #1c2633;border-radius:12px;overflow:hidden;margin-bottom:14px}
@@ -63,11 +71,11 @@ footer{padding:16px;font-size:11px;color:#565e68;line-height:1.7;border-top:1px 
   ④ "智能指数"是 10 项基准加权综合分；单一维度任务请看对应分类，别只看总分。<br>
   ⑤ 真实用量榜反映生产环境实际选择，和分数榜经常对不上——便宜和快也是竞争力。
 </footer>
-<script src="manual.js?v=1792929770"></script>
-<script src="realdata.js?v=1792929770"></script>
-<script src="local.js?v=1792929770"></script>
+<script src="manual.js?v=1792930119"></script>
+<script src="realdata.js?v=1792930119"></script>
+<script src="local.js?v=1792930119"></script>
 
-<script src="auto.js?v=1792929770"></script>
+<script src="auto.js?v=1792930119"></script>
 <script>
 const CATS = [PICK_CAT, ...AUTO_CATS, ...REAL_CATS, DESIGN_CAT];
 const $ = s => document.querySelector(s);
@@ -169,7 +177,14 @@ const tabs = $('#tabs');
 CATS.forEach((c,i) => {
   const b = document.createElement('div');
   b.className = 'tab' + (i===0?' on':'');
-  b.textContent = c.name;
+  // 名称形如「🎯 场景速查」，emoji 单独成 span，窄屏下优先保住文字
+  const parts = String(c.name).split(' ');
+  if(parts.length > 1 && parts[0].length <= 4){
+    b.innerHTML = `<span class="em">${parts[0]}</span><span>${esc(parts.slice(1).join(' '))}</span>`;
+  } else {
+    b.textContent = c.name;
+  }
+  b.title = c.name;
   b.onclick = () => {
     [...tabs.children].forEach(x => x.classList.remove('on'));
     b.classList.add('on');
