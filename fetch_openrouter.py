@@ -10,7 +10,8 @@
   GET /api/v1/benchmarks?source=design-arena&arena=models&category=codecategories
   GET /api/v1/models                                          公开目录（无需 key，用于 slug→显示名）
 """
-import json, os, sys, time, urllib.parse, urllib.request, tempfile
+import json
+import re, os, sys, time, urllib.parse, urllib.request, tempfile
 from collections import defaultdict
 from datetime import date, timedelta
 
@@ -72,7 +73,7 @@ def main():
         return 0
 
     # 1) 模型显示名映射（公开接口，无需 key）
-    name_of, auth_name = {}, {}
+    name_of, auth_name, created_of = {}, {}, {}
     try:
         cat = get('/models', auth=False)
         models = cat.get('data', [])
@@ -90,18 +91,43 @@ def main():
                 for k in (mid, m.get('canonical_slug')):
                     if k:
                         name_of.setdefault(k, nm)
+                        created_of.setdefault(k, m.get('created') or 0)
         print(f'[openrouter] catalog {len(name_of)} slugs / {len(auth_name)} authors', file=sys.stderr)
     except Exception as e:
         print(f'[openrouter] catalog failed ({e}) — 用 slug 尾部当名字', file=sys.stderr)
 
-    def pretty(slug):
+    # ---- 快照归并：同一产品的多个版本号快照合并显示，避免「DeepSeek V4.1 Flash」
+    #      和「DeepSeek V4.1 Flash (20261017)」拆成两行各占 1、2 名 ----
+    PROD_RE = re.compile(r'^(.*?)[-@_](\d{8})$')   # 尾部 8 位日期版本号
+
+    def product_key(slug):
+        """同一产品的 slug 归到同一个 key：去掉 :free/:batch 变体和尾部日期。"""
+        base = slug
+        for suf in (':free', ':batch', ':nitro', ':floor', ':extended', ':thinking'):
+            if base.endswith(suf):
+                base = base[:-len(suf)]
+        m = PROD_RE.match(base)
+        return m.group(1) if m else base
+
+    def product_name(slug):
+        """产品显示名：优先 catalog 名（已不含日期），否则去掉尾部日期后美化。"""
+        key = product_key(slug)
+        nm = name_of.get(key) or name_of.get(key + '-free')
+        if not nm:
+            for cand, cn in name_of.items():
+                if product_key(cand) == key:
+                    nm = cn
+                    break
+        if not nm:
+            nm = key.split('/')[-1].replace('-', ' ').title()
+        # 去掉名称里可能残留的 (batch)/(free) 之类变体后缀
+        nm = re.sub(r'\s*\((?:batch|free|nitro|extended|thinking)\)$', '', nm)
+        return nm
+
+    def display(slug):
         base = slug
         free = base.endswith(':free')
-        if free:
-            base = base[:-5]
-        nm = name_of.get(base) or name_of.get(slug)
-        if not nm:
-            nm = base.split('/')[-1].replace('-', ' ').title()
+        nm = product_name(slug)
         return nm + (' (free)' if free else '')
 
     def author(slug):
@@ -124,12 +150,26 @@ def main():
         raise RuntimeError('rankings-daily 返回空数据')
     print(f'[openrouter] {len(days)} days {days[0]}..{days[-1]}', file=sys.stderr)
 
-    def window(dlist):
+    def window(dlist, fold=True):
         agg = defaultdict(int)
         for d in dlist:
             for k, v in per_day[d].items():
-                agg[k] += v
+                agg[product_key(k) if fold else k] += v
         return agg
+
+    # 归并后要取显示名：优先用该产品「最新版本号」的 slug 查 catalog，
+    # 查不到再退回产品 key 本身。这样 DeepSeek V4.1 Flash 的两个快照合并后仍叫原名。
+    rep = {}
+    for slug in {x['model_permaslug'] for x in rows}:
+        pk = product_key(slug)
+        prev = rep.get(pk)
+        if prev is None or slug > prev:      # 版本号靠后的 slug 字典序更大
+            rep[pk] = slug
+
+    def disp(slug_or_key):
+        """窗口聚合后的 key 是产品 key，映射回代表 slug 再取显示名。"""
+        real = rep.get(slug_or_key, slug_or_key)
+        return display(real)
 
     last1 = window(days[-1:])
     last7 = window(days[-7:])
@@ -139,8 +179,9 @@ def main():
     def top(d, n=10, key=None):
         return sorted(d.items(), key=lambda kv: -kv[1])[:n]
 
-    week = [[pretty(k), author(k), fmt(v), pct(v, prev7.get(k, 0))] for k, v in top(last7)]
-    today = [[pretty(k), author(k), fmt(v), pct(v, per_day[days[-2]].get(k, 0))] for k, v in top(last1)]
+    week = [[disp(k), author(k), fmt(v), pct(v, prev7.get(k, 0))] for k, v in top(last7)]
+    prev_day = window(days[-2:-1])   # 昨日也需按产品归并，否则比值会飙到几千%
+    today = [[disp(k), author(k), fmt(v), pct(v, prev_day.get(k, 0))] for k, v in top(last1)]
 
     # trending: 绝对增量（本周 vs 前一周），过滤本周 <1M
     growth = [(k, last7[k] - prev7.get(k, 0), last7[k]) for k in last7]
@@ -150,19 +191,19 @@ def main():
     for k, delta, cur in growth[:5]:
         prev = prev7.get(k, 0)
         tag = '新上榜' if prev == 0 else f'{"+" if delta > 0 else ""}{delta/prev*100:.0f}%'
-        trending.append([pretty(k), author(k), fmt(cur), tag])
+        trending.append([disp(k), author(k), fmt(cur), tag])
 
     # 3) 厂商 token 份额
     by_auth = defaultdict(int)
     tot = 0
     prev_auth = defaultdict(int)
     for k, v in last7.items():
-        a = author(k)
+        a = author(rep.get(k, k))
         by_auth[a] += v
         tot += v
     ptot = sum(prev7.values()) or 1
     for k, v in prev7.items():
-        prev_auth[author(k)] += v
+        prev_auth[author(rep.get(k, k))] += v
     share = []
     for a, v in sorted(by_auth.items(), key=lambda kv: -kv[1])[:9]:
         share.append([a, f'{v/tot*100:.1f}%', pct(v, prev_auth.get(a, 0)) if v >= 1e9 else GAP])
@@ -191,7 +232,7 @@ def main():
         items = [x for x in bm.get('data', []) if x.get('elo')]
         items.sort(key=lambda x: -x['elo'])
         for x in items[:12]:
-            nm = x.get('display_name') or pretty(x.get('model_permaslug', ''))
+            nm = x.get('display_name') or display(x.get('model_permaslug', ''))
             design.append([nm, author(x.get('model_permaslug', '')).title(), str(int(x['elo']))])
     except Exception as e:
         print(f'[openrouter] design-arena failed: {e}', file=sys.stderr)
@@ -209,7 +250,7 @@ def main():
                 continue
             seen.add(k)
             sessions.append([c.get('app_name') or c.get('app_slug'),
-                             pretty(c.get('model_permaslug', '')),
+                             display(c.get('model_permaslug', '')),
                              f"${float(c['median_session_cost_usd']):.2f}"])
             if len(sessions) >= 12:
                 break
@@ -243,8 +284,8 @@ def main():
         rows = [x for x in d.get('data', []) if x['model_permaslug'] != 'other']
         agg = defaultdict(int)
         for x in rows:
-            agg[x['model_permaslug']] += int(x['total_tokens'])
-        return [[pretty(k), author(k), fmt(v)] for k, v in
+            agg[product_key(x['model_permaslug'])] += int(x['total_tokens'])
+        return [[disp(k), author(k), fmt(v)] for k, v in
                 sorted(agg.items(), key=lambda kv: -kv[1])[:n]]
 
     coding, longctx = [], []
