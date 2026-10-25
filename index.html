@@ -38,8 +38,8 @@ td{padding-top:9px;padding-bottom:9px;border-bottom:1px solid #161b22;vertical-a
 tr:last-child td{border-bottom:none}
 td.rk,th.rk{color:#6e7681;font-variant-numeric:tabular-nums;text-align:left;padding-left:9px;padding-right:9px}
 th.c-num,td.sc{text-align:left}
-td.mn{font-weight:500;color:#e6edf3;min-width:0;text-align:left}
-td.org{color:#8b949e;font-size:11.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:left}
+td.mn{font-weight:500;color:#e6edf3;min-width:0;text-align:left;overflow-wrap:anywhere}
+td.org{color:#8b949e;font-size:11.5px;overflow-wrap:anywhere;text-align:left}
 td.sc{text-align:left;font-variant-numeric:tabular-nums;font-weight:600;color:#58a6ff;font-size:11.5px;overflow-wrap:anywhere}
 tr.gold td.sc{color:#e3b341}
 tr.gold td.mn::before{content:"★ ";color:#e3b341}
@@ -71,11 +71,11 @@ footer{padding:16px;font-size:11px;color:#565e68;line-height:1.7;border-top:1px 
   ④ "智能指数"是 10 项基准加权综合分；单一维度任务请看对应分类，别只看总分。<br>
   ⑤ 真实用量榜反映生产环境实际选择，和分数榜经常对不上——便宜和快也是竞争力。
 </footer>
-<script src="manual.js?v=1792930801"></script>
-<script src="realdata.js?v=1792930801"></script>
-<script src="local.js?v=1792930801"></script>
+<script src="manual.js?v=1792930119"></script>
+<script src="realdata.js?v=1792930119"></script>
+<script src="local.js?v=1792930119"></script>
 
-<script src="auto.js?v=1792930801"></script>
+<script src="auto.js?v=1792930119"></script>
 <script>
 const CATS = [PICK_CAT, ...AUTO_CATS, ...REAL_CATS, DESIGN_CAT];
 const $ = s => document.querySelector(s);
@@ -116,15 +116,195 @@ function numCol(rows, j){
   return n / rows.length >= 0.6;
 }
 
+// 单个字符的实际像素宽度：中文站默认 12px 字号，页面缩放会把它压小，
+// 用运行时实测值而不是写死 6.4，避免窄屏下算出来放得下、实际却溢出。
+// 单段文本的真实渲染宽度（像素）。canvas 不可用时退回字符计数 × 6.4。
+var _ctxCache = null;
+function measureCtx(){
+  if(_ctxCache) return _ctxCache;
+  var t = document.querySelector('#main table tbody td');
+  var cs = t ? getComputedStyle(t) : null;
+  var fs = cs ? cs.fontSize : '12px';
+  try{
+    var cv = document.createElement('canvas');
+    var ctx = cv.getContext('2d');
+    ctx.font = (cs ? cs.fontStyle + ' ' + cs.fontWeight + ' ' : '') + fs + ' ' + (cs ? cs.fontFamily : 'sans-serif');
+    _ctxCache = ctx;
+  }catch(e){ _ctxCache = false; }
+  return _ctxCache;
+}
+
+function textPx(v){
+  v = String(v == null ? '' : v);
+  var ctx = measureCtx();
+  if(ctx){
+    var w = ctx.measureText(v).width;
+    if(w > 0) return Math.ceil(w);
+  }
+  var n = 0;
+  for(var i = 0; i < v.length; i++) n += v.charCodeAt(i) > 0x2E80 ? 2 : 1;
+  return n * unit();
+}
+
+function unit(){
+  var m = measuredCharPx();
+  return m > 0 ? m : charPx();
+}
+
+function charPx(){
+  var t = document.querySelector('#main table tbody td');
+  var fs = t ? parseFloat(getComputedStyle(t).fontSize) : 12;
+  return (isNaN(fs) || fs <= 0) ? 6.4 : fs * 0.533;
+}
+
+// 用 canvas 实测「当前字号下 1 个字符的平均像素宽」，着色后回写。
+// 比例字体里 w/i/m 宽度差别很大，纯字符计数会有 ±20% 误差，窄屏直接导致溢出。
+var _cpCache = null;
+function measuredCharPx(){
+  if(_cpCache) return _cpCache;
+  var t = document.querySelector('#main table tbody td');
+  if(!t) return charPx();
+  var cs = getComputedStyle(t);
+  try{
+    var cv = document.createElement('canvas');
+    var ctx = cv.getContext('2d');
+    ctx.font = cs.fontStyle + ' ' + cs.fontWeight + ' ' + cs.fontSize + ' ' + cs.fontFamily;
+    var n = ctx.measureText('abcdefghijklmnop').width / 16;
+    if(n > 1 && n < 30){ _cpCache = n; return n; }
+  }catch(e){}
+  return charPx();
+}
+
+// 表格可用宽度：优先量真实表格，其次量容器，最后退回视口。
+function measureWidth(){
+  var t = document.querySelector('#main table');
+  if(t){ var w = t.getBoundingClientRect().width; if(w > 40) return w; }
+  var m = document.getElementById('main');
+  if(m){ var w2 = m.clientWidth - 32; if(w2 > 40) return w2; }
+  return Math.max(200, document.body.clientWidth - 34);
+}
+
+// 列宽计算：按各列内容实际需要的宽度分配，而不是一刀切等分。
+//   1) 每列取「90 分位字符宽」作为需求（CJK 记 2、其他记 1），个别超长名不拖爆整列；
+//   2) 需求开方压缩差距，得到初始权重，避免短列被压成一条缝；
+//   3) 按当前客户端真实表格宽度换算成像素，逐列复核「文字 + 左右内边距」是否放得下，
+//      放不下就补权重、其他列等比例让出，最多迭代 4 轮。
+// 因为宽度来自运行时实测，手机 / 平板 / 桌面各自算各自的，无需媒体查询断点。
+function colWeights(cols, rows, rank){
+  var need = [];
+  var minPx = [];
+  if(rank){ need.push(30); minPx.push(26); }
+
+  function cw(v){
+    v = String(v == null ? '' : v);
+    var w = 0;
+    for(var i = 0; i < v.length; i++) w += v.charCodeAt(i) > 0x2E80 ? 2 : 1;
+    return w;
+  }
+
+  // 需求 = 该列文本的真实渲染像素宽（canvas 实测字形，含比例字体差异）
+  cols.forEach(function(c, j){
+    var vals = rows.map(function(r){ return textPx(r[j]); });
+    vals.push(textPx(c) * 1.05);               // 表头本身也要放得下
+    vals.sort(function(a, b){ return a - b; });
+    var q90 = vals[Math.min(vals.length - 1, Math.floor(vals.length * 0.9))];
+    // 下限 34px：保证表头和短数字（如 +7%、28）不会被压成一条缝
+    need.push(Math.max(34, q90));
+    minPx.push(j === 0 ? 30 : 40);
+  });
+
+  // 厂商列按「未缩写的最长名」算需求，避免 shortOrg 缩了文本仍被挤爆
+  if(cols.length > 1){
+    // 用 75 分位而不是最大值：少数超长厂商名走省略号，不为此把整列拉宽
+    var idx = rank ? 2 : 1, ov = [];
+    rows.forEach(function(r){ ov.push(textPx(shortOrg(r[1]))); });
+    ov.sort(function(a, b){ return a - b; });
+    var q = ov[Math.min(ov.length - 1, Math.floor(ov.length * 0.75))];
+    if(q > need[idx]) need[idx] = q;
+  }
+
+  // 真实字形校准：用 canvas 量一次「单位字符」的实际像素宽，
+  // 修正「CJK=2 / 其他=1」字符计数与实际字宽的偏差（比例字体下误差可达 20%）。
+  var avg = need.reduce(function(a, b){ return a + b; }, 0) / need.length;
+  if(!need.length) return [];
+  var k = need.map(function(x){ return Math.sqrt(Math.max(x, 6) / Math.max(avg, 6)); });
+
+  // 需求本身按字符计，先算总需求，超宽时整体等比压缩（而不是让某一列被挤成一条缝）
+  var tw = measureWidth();
+  if(tw > 40){
+    var avail = Math.max(60, tw - 18 * need.length);   // 扣掉每列左右 9px 内边距
+    var sumNeed = need.reduce(function(a, b){ return a + b; }, 0);
+    // 每列上限 = 可用宽度按需等比分配后能拿到的最大值（单位：像素）
+    var avgNeed = sumNeed / need.length;
+    var cap = Math.max(avgNeed * 1.6, avail / need.length);   // 上限：均分宽度的 1.6 倍
+    for(var round = 0; round < 4; round++){
+      var tot = k.reduce(function(a, b){ return a + b; }, 0);
+      var px = k.map(function(x){ return avail * x / tot; });
+      var fix = false, deficit = 0;
+      for(var i = 0; i < need.length; i++){
+        var want = Math.min(need[i], cap);        // 受上限约束后的期望宽度
+        if(px[i] < want - 0.5){ deficit += want - px[i]; fix = true; }
+      }
+      if(!fix) break;
+      // 只给缺得最多的列补权重：按缺口比例一次性补，其余列在下一轮归一化时等比例让出
+      var tot2 = k.reduce(function(a, b){ return a + b; }, 0);
+      for(var i2 = 0; i2 < need.length; i2++){
+        var w2 = Math.min(need[i2], cap) * 6.4;
+        if(px[i2] < w2 - 0.5){
+          k[i2] *= 1 + (w2 - px[i2]) / Math.max(avail * k[i2] / tot2, 1);
+        }
+      }
+    }
+  }
+  // 最终分配：先固化每列「必须的最小像素」，剩余宽度按需求比例分给各列，
+  // 然后再把低于最小值的列抬到最小值，多出的差额从最宽的列按比例扣回。
+  // 全程线性计算，不做迭代，因此结果单调、可控。
+  var tw3 = measureWidth();
+  if(tw3 > 40){
+    var avail3 = Math.max(80, tw3 - 18 * need.length);
+    var nCol = need.length;
+    // 最小宽度 = 该列 90 分位文字宽 + 内边距 + 2px 余量（单格字形差异留缓冲）
+    var hardMin = need.map(function(x){ return Math.min(x + 20, avail3 * 0.45); });
+    var sumMin = hardMin.reduce(function(a, b){ return a + b; }, 0);
+    var sumN3 = need.reduce(function(a, b){ return a + b; }, 0);
+
+    if(sumMin >= avail3){
+      // 极端窄屏：连最小宽度都放不下，直接按最小宽度等比例缩
+      k = hardMin.slice();
+    } else {
+      var extra = avail3 - sumMin;
+      k = need.map(function(x, i){ return hardMin[i] + extra * (x / Math.max(sumN3, 1)); });
+      // 回收：最宽的列最多不超过「均分宽度 × 2.2」，超出部分再分给其余列
+      var capW = avail3 / nCol * 2.2;
+      for(var r3 = 0; r3 < 6; r3++){
+        var over = 0;
+        for(var i5 = 0; i5 < nCol; i5++){
+          if(k[i5] > capW){ over += k[i5] - capW; k[i5] = capW; }
+        }
+        if(over <= 0.5) break;
+        var smallSum = 0;
+        for(var i6 = 0; i6 < nCol; i6++){ if(k[i6] < capW) smallSum += need[i6]; }
+        if(smallSum <= 0) break;
+        for(var i7 = 0; i7 < nCol; i7++){
+          if(k[i7] < capW) k[i7] += over * need[i7] / smallSum;
+        }
+      }
+    }
+    return k;                                       // 像素权重，table() 归一化成百分比
+  }
+  return k.map(function(x){ return Math.min(6, Math.max(0.2, x)); });
+}
+
 function table(cols, rows, rank){
   // 所有列一律左对齐（含序号列与数值列）。
   // 列宽 = 表格实际宽度 ÷ 列数，等宽分割；由 CSS table-layout:fixed 在渲染时
   // 按当前客户端真实宽度计算，因此手机/平板/桌面打开都自动适配，无需断点。
   const n = cols.length + (rank ? 1 : 0);
-  const w = (100 / n).toFixed(4) + '%';
+  const wts = colWeights(cols, rows, rank);
+  const tot = wts.reduce(function(a,b){return a+b;}, 0);
 
   let h = '<table><colgroup>';
-  for(let k = 0; k < n; k++) h += `<col style="width:${w}">`;
+  wts.forEach(function(x){ h += `<col style="width:${(x / tot * 100).toFixed(4)}%">`; });
   h += '</colgroup><thead><tr>';
   if(rank) h += '<th class="rk"></th>';
   cols.forEach((c,j) => h += `<th class="${j > 0 ? 'c-num' : ''}">${esc(c)}</th>`);
