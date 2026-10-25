@@ -1,22 +1,22 @@
 /* 自动生成 —— 由 fetch_openrouter.py 从 OpenRouter Data API 构建
-   数据截止 2026-10-23（周=最近7个完整日，月=最近30日） · 生成 2026-10-24 01:24
+   数据截止 2026-10-24（周=最近7个完整日，月=最近30日） · 生成 2026-10-25 00:53
    注：rankings-daily 每日只给 top50 模型，跨日合计会漏掉长尾
-   许可 CC BY 4.0 · Source: OpenRouter (openrouter.ai/rankings) as of 2026-10-24T01:23:40.618Z; Design Arena via OpenRouter */
+   许可 CC BY 4.0 · Source: OpenRouter (openrouter.ai/rankings) as of 2026-10-25T00:53:47.445Z; Design Arena via OpenRouter */
 
-const REAL_ASOF = "2026-10-23";
+const REAL_ASOF = "2026-10-24";
 const REAL = {
   "week": [
     [
       "DeepSeek V4.1 Flash 1017",
       "DeepSeek",
-      "26.7T",
-      "新上榜"
+      "30.8T",
+      "+4415%"
     ],
     [
       "DeepSeek V4.1 Flash",
       "DeepSeek",
-      "20.5T",
-      "-44%"
+      "18.7T",
+      "-48%"
     ],
     [
       "MiniMax M3.1 Flash (free)",
@@ -27,114 +27,114 @@ const REAL = {
     [
       "GLM 5.3 Flash",
       "Z.ai",
-      "11.9T",
-      "-6%"
+      "12.5T",
+      "-0.4%"
     ],
     [
       "Hy4 preview",
       "Tencent",
       "8.8T",
-      "+12%"
+      "+17%"
     ],
     [
       "Claude Opus 5.5",
       "Anthropic",
-      "8T",
-      "+35%"
-    ],
-    [
-      "MiMo-V2.6-Flash",
-      "Xiaomi",
-      "7.4T",
-      "-32%"
+      "8.3T",
+      "+36%"
     ],
     [
       "GPT-6 Luna",
       "OpenAI",
-      "6.7T",
-      "+4%"
+      "7.5T",
+      "+20%"
+    ],
+    [
+      "MiMo-V2.6-Flash",
+      "Xiaomi",
+      "6.8T",
+      "-35%"
     ],
     [
       "Nemotron 3 Ultra (free)",
       "NVIDIA",
-      "5.4T",
-      "-14%"
+      "6T",
+      "+12%"
     ],
     [
       "GLM 5.3",
       "Z.ai",
       "5T",
-      "-4%"
+      "-6%"
     ]
   ],
   "today": [
     [
       "DeepSeek V4.1 Flash 1017",
       "DeepSeek",
-      "5T",
-      "-3%"
+      "4.8T",
+      "-5%"
     ],
     [
       "DeepSeek V4.1 Flash",
       "DeepSeek",
-      "2.5T",
-      "-15%"
+      "2.2T",
+      "-9%"
     ],
     [
       "GLM 5.3 Flash",
       "Z.ai",
       "2.2T",
-      "+14%"
+      "+2%"
     ],
     [
       "GPT-6 Luna",
       "OpenAI",
-      "1.6T",
-      "+65%"
+      "1.5T",
+      "-10%"
     ],
     [
       "Claude Opus 5.5",
       "Anthropic",
-      "1.5T",
-      "+15%"
+      "1T",
+      "-33%"
     ],
     [
       "Hy4 preview",
       "Tencent",
-      "1.3T",
-      "-8%"
+      "978.27B",
+      "-27%"
+    ],
+    [
+      "Step 5 Preview",
+      "StepFun",
+      "799.96B",
+      "+37%"
     ],
     [
       "Nemotron 3 Ultra (free)",
       "NVIDIA",
-      "882.8B",
-      "-6%"
-    ],
-    [
-      "MiMo-V2.6-Flash",
-      "Xiaomi",
-      "852.3B",
-      "-9%"
+      "624.65B",
+      "-29%"
     ],
     [
       "GLM 5.3",
       "Z.ai",
-      "816.44B",
-      "-11%"
+      "609.95B",
+      "-25%"
     ],
     [
-      "DeepSeek V4 Flash 0731",
-      "DeepSeek",
-      "601.09B",
-      "+3%"
+      "MiMo-V2.6-Flash",
+      "Xiaomi",
+      "511.09B",
+      "-40%"
     ]
   ],
   "trending": [
     [
       "DeepSeek V4.1 Flash 1017",
       "DeepSeek",
-      "26.7T",
-      "新上榜"
+      "30.8T",
+      "+4415%"
     ],
     [
       "MiniMax M3.1 Flash (free)",
@@ -145,124 +145,124 @@ const REAL = {
     [
       "Claude Opus 5.5",
       "Anthropic",
-      "8T",
-      "+35%"
+      "8.3T",
+      "+36%"
     ],
     [
-      "Jev 1.14 20261014",
-      "TypeSafe",
-      "1.6T",
-      "+471%"
+      "Hy4 preview",
+      "Tencent",
+      "8.8T",
+      "+17%"
     ],
     [
-      "Nemotron 3.5 Super VL (free)",
-      "NVIDIA",
-      "1.3T",
-      "+355%"
+      "GPT-6 Luna",
+      "OpenAI",
+      "7.5T",
+      "+20%"
     ]
   ],
   "share": [
     [
       "DeepSeek",
-      "33.4%",
-      "+20%"
+      "33.7%",
+      "+26%"
     ],
     [
       "Z.ai",
       "10.7%",
-      "-6%"
+      "-2%"
     ],
     [
       "MiniMax",
-      "9.1%",
-      "+990%"
+      "9.0%",
+      "+1011%"
     ],
     [
       "Anthropic",
-      "8.8%",
+      "8.6%",
       "+21%"
     ],
     [
       "OpenAI",
-      "7.6%",
-      "+2%"
+      "8.0%",
+      "+14%"
     ],
     [
       "Tencent",
-      "7.0%",
-      "+6%"
+      "6.9%",
+      "+11%"
     ],
     [
       "Xiaomi",
-      "5.6%",
-      "-29%"
+      "5.0%",
+      "-32%"
     ],
     [
       "NVIDIA",
-      "4.7%",
-      "-9%"
+      "4.9%",
+      "+7%"
     ],
     [
       "Google",
-      "3.1%",
-      "-8%"
+      "3.0%",
+      "-10%"
     ],
     [
       "其他合计",
-      "10.0%",
+      "10.2%",
       "—"
     ]
   ],
   "apps": [
     [
       "Claude Code",
-      "16.6M",
-      "2T"
+      "14.7M",
+      "1.6T"
     ],
     [
       "Hermes Agent",
-      "16.1M",
-      "1.7T"
+      "14.3M",
+      "1.5T"
     ],
     [
       "pi",
-      "5.9M",
-      "657.49B"
+      "5.6M",
+      "746.25B"
     ],
     [
       "Kilo Code",
-      "5.7M",
-      "532.46B"
-    ],
-    [
-      "Codex",
-      "5.1M",
-      "383.36B"
+      "5.9M",
+      "561.7B"
     ],
     [
       "DeepSeek Harness",
       "1.9M",
-      "361.08B"
+      "351.07B"
     ],
     [
-      "omp",
-      "2.0M",
-      "314.26B"
+      "Codex",
+      "4.1M",
+      "342.95B"
     ],
     [
       "Freebuff",
-      "2.3M",
-      "273.72B"
+      "2.1M",
+      "249.77B"
+    ],
+    [
+      "omp",
+      "1.4M",
+      "225.71B"
     ],
     [
       "OpenClaw",
-      "2.4M",
-      "208.02B"
+      "2.2M",
+      "187.99B"
     ],
     [
       "Cline",
-      "1.9M",
-      "143.89B"
+      "1.6M",
+      "123.15B"
     ]
   ],
   "sessions": [
@@ -330,75 +330,65 @@ const REAL = {
   "tasks": [
     [
       "Workflow Execution",
-      "9.2%",
-      "23.4%"
+      "9.4%",
+      "23.0%"
     ],
     [
       "Classification",
-      "33.3%",
-      "10.4%"
+      "33.5%",
+      "11.2%"
     ],
     [
       "Code Generation",
       "2.6%",
-      "9.2%"
+      "9.1%"
     ],
     [
       "Multi-step Planning",
-      "3.7%",
-      "8.4%"
+      "3.9%",
+      "8.3%"
     ],
     [
       "Debugging",
-      "1.6%",
+      "1.7%",
       "5.4%"
     ],
     [
       "Data Extraction",
-      "13.5%",
+      "13.2%",
       "5.2%"
     ],
     [
       "File I/O",
-      "1.5%",
+      "1.6%",
       "5.0%"
     ],
     [
-      "Code Review",
-      "1.6%",
-      "3.0%"
+      "Q&A & Knowledge",
+      "3.1%",
+      "3.1%"
     ],
     [
-      "Q&A & Knowledge",
-      "3.2%",
-      "2.9%"
+      "Code Review",
+      "1.5%",
+      "3.0%"
     ],
     [
       "Roleplay & Fiction",
       "6.9%",
-      "2.8%"
+      "2.7%"
     ],
     [
       "其他合计",
-      "22.9%",
-      "24.2%"
+      "22.7%",
+      "24.1%"
     ]
   ],
   "coding": [
     [
       "DeepSeek V4.1 Flash 1017",
       "DeepSeek",
-      "6.2T"
-    ],
-    [
-      "DeepSeek V4.1 Flash",
-      "DeepSeek",
-      "4.8T"
-    ],
-    [
-      "MiMo-V2.6-Flash",
-      "Xiaomi",
-      "4.5T"
+      "7T"
     ],
     [
       "MiniMax M3.1 Flash (free)",
@@ -406,33 +396,43 @@ const REAL = {
       "4.1T"
     ],
     [
-      "GLM 5.3 Flash",
-      "Z.ai",
-      "3.3T"
+      "DeepSeek V4.1 Flash",
+      "DeepSeek",
+      "3.9T"
+    ],
+    [
+      "MiMo-V2.6-Flash",
+      "Xiaomi",
+      "3.8T"
     ],
     [
       "Nemotron 3 Ultra (free)",
       "NVIDIA",
-      "3.2T"
+      "3.7T"
+    ],
+    [
+      "GLM 5.3 Flash",
+      "Z.ai",
+      "3T"
     ],
     [
       "Muse Spark 1.3 Contributor",
       "Meta",
-      "2.1T"
-    ],
-    [
-      "GLM 5.3",
-      "Z.ai",
-      "1.9T"
-    ],
-    [
-      "GPT-6 Luna",
-      "OpenAI",
-      "1.3T"
+      "1.8T"
     ],
     [
       "Step 5 Preview",
       "StepFun",
+      "1.8T"
+    ],
+    [
+      "GLM 5.3",
+      "Z.ai",
+      "1.6T"
+    ],
+    [
+      "GPT-6 Luna",
+      "OpenAI",
       "1.2T"
     ]
   ],
@@ -440,32 +440,32 @@ const REAL = {
     [
       "DeepSeek V4.1 Flash 1017",
       "DeepSeek",
-      "6.2T"
+      "7.2T"
     ],
     [
       "DeepSeek V4.1 Flash",
       "DeepSeek",
-      "5.8T"
+      "5.7T"
     ],
     [
       "GLM 5.3 Flash",
       "Z.ai",
-      "4.9T"
-    ],
-    [
-      "Hy4 preview",
-      "Tencent",
-      "2.6T"
+      "5T"
     ],
     [
       "GPT-6 Luna",
       "OpenAI",
-      "2.6T"
+      "2.9T"
+    ],
+    [
+      "Hy4 preview",
+      "Tencent",
+      "2.7T"
     ],
     [
       "MiMo-V2.6-Flash",
       "Xiaomi",
-      "2.3T"
+      "2.1T"
     ],
     [
       "MiniMax M3.1 Flash (free)",
@@ -493,12 +493,12 @@ const DESIGN = [
   [
     "Claude Opus 5.5",
     "Anthropic",
-    "1390"
+    "1389"
   ],
   [
     "Muse Wonder (max)",
     "Meta",
-    "1378"
+    "1377"
   ],
   [
     "Kimi K3",
@@ -508,17 +508,22 @@ const DESIGN = [
   [
     "GPT-6.1 Sol",
     "Openai",
-    "1359"
+    "1358"
+  ],
+  [
+    "Kimi K3.1 Pro",
+    "Moonshotai",
+    "1356"
   ],
   [
     "Claude Sonnet 5.5",
     "Anthropic",
-    "1356"
+    "1354"
   ],
   [
     "Muse Spark 1.3 (xhigh)",
     "Meta",
-    "1351"
+    "1350"
   ],
   [
     "Muse Spark 1.3 Max",
@@ -533,7 +538,7 @@ const DESIGN = [
   [
     "Gemini 4 Argon",
     "Google",
-    "1330"
+    "1329"
   ],
   [
     "Claude Opus 5",
@@ -543,11 +548,6 @@ const DESIGN = [
   [
     "MiMo-V2.6-Pro",
     "Xiaomi",
-    "1316"
-  ],
-  [
-    "Muse Spark 1.2",
-    "Meta",
-    "1312"
+    "1315"
   ]
 ];
