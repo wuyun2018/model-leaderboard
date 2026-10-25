@@ -1,7 +1,7 @@
 /* 自动生成 —— 由 fetch_openrouter.py 从 OpenRouter Data API 构建
-   数据截止 2026-10-24（周=最近7个完整日，月=最近30日） · 生成 2026-10-25 12:09
+   数据截止 2026-10-24（周=最近7个完整日，月=最近30日） · 生成 2026-10-25 12:20
    注：rankings-daily 每日只给 top50 模型，跨日合计会漏掉长尾
-   许可 CC BY 4.0 · Source: OpenRouter (openrouter.ai/rankings) as of 2026-10-25T12:09:16.548Z; Design Arena via OpenRouter */
+   许可 CC BY 4.0 · Source: OpenRouter (openrouter.ai/rankings) as of 2026-10-25T12:19:59.015Z; Design Arena via OpenRouter */
 
 const REAL_ASOF = "2026-10-24";
 const REAL = {
@@ -274,17 +274,17 @@ const REAL = {
     [
       "Codex",
       "Claude Opus 5.5",
-      "$4.15"
-    ],
-    [
-      "Claude Code",
-      "Claude Fable 5.1",
-      "$3.73"
+      "$4.13"
     ],
     [
       "Hermes Agent",
       "Claude Fable 5",
       "$3.72"
+    ],
+    [
+      "Claude Code",
+      "Claude Fable 5.1",
+      "$3.71"
     ],
     [
       "Hermes Agent",
@@ -294,7 +294,7 @@ const REAL = {
     [
       "Codex",
       "GPT-6 Astra",
-      "$2.79"
+      "$2.80"
     ],
     [
       "Hermes Agent",
@@ -309,7 +309,7 @@ const REAL = {
     [
       "Claude Code",
       "Claude Opus 5",
-      "$2.08"
+      "$2.09"
     ],
     [
       "Claude Code",
