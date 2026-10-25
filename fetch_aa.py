@@ -93,4 +93,19 @@ with open(tmp, 'w', encoding='utf-8') as f:
     json.dump(out, f, ensure_ascii=False)
 os.replace(tmp, OUT)
 active = sum(1 for m in out if not m.get('deprecated'))
+
+# 记录抓取时间（北京时间），供 build.py 生成 DATA_DATE
+from datetime import datetime, timedelta, timezone
+meta = {
+    'fetched_at': datetime.now(timezone(timedelta(hours=8))).strftime('%Y-%m-%dT%H:%M:%S+08:00'),
+    'model_count': len(out),
+    'active': active,
+}
+mp = os.path.join(HERE, 'aa_meta.json')
+mfd, mtmp = tempfile.mkstemp(dir=HERE, suffix='.json')
+os.close(mfd)
+with open(mtmp, 'w', encoding='utf-8') as f:
+    json.dump(meta, f, ensure_ascii=False)
+os.replace(mtmp, mp)
+
 print(f'OK: {len(out)} models ({active} active) -> {OUT}')
