@@ -1,27 +1,21 @@
 /* 自动生成 —— 由 fetch_openrouter.py 从 OpenRouter Data API 构建
-   数据截止 2026-10-24（周=最近7个完整日，月=最近30日） · 生成 2026-10-25 11:14
+   数据截止 2026-10-24（周=最近7个完整日，月=最近30日） · 生成 2026-10-25 19:33
    注：rankings-daily 每日只给 top50 模型，跨日合计会漏掉长尾
-   许可 CC BY 4.0 · Source: OpenRouter (openrouter.ai/rankings) as of 2026-10-25T11:14:22.493Z; Design Arena via OpenRouter */
+   许可 CC BY 4.0 · Source: OpenRouter (openrouter.ai/rankings) as of 2026-10-25T11:32:44.406Z; Design Arena via OpenRouter */
 
 const REAL_ASOF = "2026-10-24";
 const REAL = {
   "week": [
     [
-      "DeepSeek V4.1 Flash 1017",
-      "DeepSeek",
-      "30.8T",
-      "+4415%"
-    ],
-    [
       "DeepSeek V4.1 Flash",
       "DeepSeek",
-      "18.7T",
-      "-48%"
+      "49.5T",
+      "+35%"
     ],
     [
       "MiniMax M3.1 Flash (free)",
       "MiniMax",
-      "13.7T",
+      "14.1T",
       "新上榜"
     ],
     [
@@ -45,8 +39,14 @@ const REAL = {
     [
       "GPT-6 Luna",
       "OpenAI",
-      "7.5T",
+      "7.6T",
       "+20%"
+    ],
+    [
+      "DeepSeek V4 Flash 0423",
+      "DeepSeek",
+      "6.9T",
+      "-12%"
     ],
     [
       "MiMo-V2.6-Flash",
@@ -69,16 +69,10 @@ const REAL = {
   ],
   "today": [
     [
-      "DeepSeek V4.1 Flash 1017",
-      "DeepSeek",
-      "4.8T",
-      "-5%"
-    ],
-    [
       "DeepSeek V4.1 Flash",
       "DeepSeek",
-      "2.2T",
-      "-9%"
+      "7T",
+      "-7%"
     ],
     [
       "GLM 5.3 Flash",
@@ -103,6 +97,12 @@ const REAL = {
       "Tencent",
       "978.27B",
       "-27%"
+    ],
+    [
+      "DeepSeek V4 Flash 0423",
+      "DeepSeek",
+      "860.14B",
+      "-15%"
     ],
     [
       "Step 5 Preview",
@@ -131,16 +131,16 @@ const REAL = {
   ],
   "trending": [
     [
-      "DeepSeek V4.1 Flash 1017",
-      "DeepSeek",
-      "30.8T",
-      "+4415%"
-    ],
-    [
       "MiniMax M3.1 Flash (free)",
       "MiniMax",
-      "13.7T",
+      "14.1T",
       "新上榜"
+    ],
+    [
+      "DeepSeek V4.1 Flash",
+      "DeepSeek",
+      "49.5T",
+      "+35%"
     ],
     [
       "Claude Opus 5.5",
@@ -157,7 +157,7 @@ const REAL = {
     [
       "GPT-6 Luna",
       "OpenAI",
-      "7.5T",
+      "7.6T",
       "+20%"
     ]
   ],
@@ -386,19 +386,14 @@ const REAL = {
   ],
   "coding": [
     [
-      "DeepSeek V4.1 Flash 1017",
+      "DeepSeek V4.1 Flash",
       "DeepSeek",
-      "7T"
+      "10.9T"
     ],
     [
       "MiniMax M3.1 Flash (free)",
       "MiniMax",
-      "4.1T"
-    ],
-    [
-      "DeepSeek V4.1 Flash",
-      "DeepSeek",
-      "3.9T"
+      "4.2T"
     ],
     [
       "MiMo-V2.6-Flash",
@@ -434,18 +429,18 @@ const REAL = {
       "GPT-6 Luna",
       "OpenAI",
       "1.2T"
+    ],
+    [
+      "Claude Opus 5.5",
+      "Anthropic",
+      "1.1T"
     ]
   ],
   "longctx": [
     [
-      "DeepSeek V4.1 Flash 1017",
-      "DeepSeek",
-      "7.2T"
-    ],
-    [
       "DeepSeek V4.1 Flash",
       "DeepSeek",
-      "5.7T"
+      "12.9T"
     ],
     [
       "GLM 5.3 Flash",
@@ -455,6 +450,11 @@ const REAL = {
     [
       "GPT-6 Luna",
       "OpenAI",
+      "3T"
+    ],
+    [
+      "DeepSeek V4 Flash 0423",
+      "DeepSeek",
       "2.9T"
     ],
     [
@@ -470,12 +470,7 @@ const REAL = {
     [
       "MiniMax M3.1 Flash (free)",
       "MiniMax",
-      "1.7T"
-    ],
-    [
-      "DeepSeek V4 Flash 0731",
-      "DeepSeek",
-      "1.7T"
+      "1.8T"
     ],
     [
       "Hy3",
@@ -486,6 +481,11 @@ const REAL = {
       "Claude Haiku 5.5",
       "Anthropic",
       "1.5T"
+    ],
+    [
+      "GLM 5.3",
+      "Z.ai",
+      "1.3T"
     ]
   ]
 };
