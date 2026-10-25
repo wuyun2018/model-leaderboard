@@ -3,7 +3,6 @@
    PICKS 为选型建议，随榜单变化手工调整
    LOCAL 为用户本地已配置模型，改动时同步更新 */
 
-const DATA_DATE = "2026-10-17";
 
 /* ===== 场景速查（手工维护） ===== */
 const PICK_CAT = { id:"pick", name:"🎯 场景速查", kind:"pick",
