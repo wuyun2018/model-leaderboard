@@ -166,7 +166,7 @@ CATS.append({
 
 # ---- 知识 / 写作 ----
 CATS.append({
-    "id": "knowledge", "name": "📖 知识 / 写作", "kind": "group",
+    "id": "knowledge", "name": "📖 知识/写作", "kind": "group",
     "desc": "专业交付物质量、知识广度、幻觉率、指令遵循",
     "groups": [
         {"title": "GDPval（专业知识工作交付物）", "cols": ["模型", "厂商", "得分"],
@@ -189,23 +189,23 @@ pool = [m for m in pool_all() if num(m.get('intelligenceIndex')) and num(m['inte
         and num(m.get('intelligenceIndexCostPerTask'))]
 pool.sort(key=lambda m: num(m['intelligenceIndexCostPerTask']))
 CHEAP = [[clean(m['name']) + (' 🟢' if m.get('isOpenWeights') else ''), m['modelCreatorName'],
-          f"智能 {num(m['intelligenceIndex']):.0f}", f"${num(m['intelligenceIndexCostPerTask']):.2f}/任务",
+          f"{num(m['intelligenceIndex']):.0f}", f"${num(m['intelligenceIndexCostPerTask']):.2f}",
           money(m)] for m in pool[:12]]
 # 每美元智能
 eff = [m for m in pool if num(m['intelligenceIndexCostPerTask']) > 0]
 eff.sort(key=lambda m: num(m['intelligenceIndex']) / num(m['intelligenceIndexCostPerTask']), reverse=True)
 EFF = [[clean(m['name']) + (' 🟢' if m.get('isOpenWeights') else ''), m['modelCreatorName'],
         f"{num(m['intelligenceIndex']) / num(m['intelligenceIndexCostPerTask']):.0f}",
-        f"智能 {num(m['intelligenceIndex']):.0f} @ ${num(m['intelligenceIndexCostPerTask']):.2f}"] for m in eff[:12]]
+        f"{num(m['intelligenceIndex']):.0f} @ ${num(m['intelligenceIndexCostPerTask']):.2f}"] for m in eff[:12]]
 
 CATS.append({
-    "id": "speed", "name": "⚡ 速度 / 成本", "kind": "group",
+    "id": "speed", "name": "⚡ 速度/成本", "kind": "group",
     "desc": "延迟榜和速度榜几乎全被小模型占据；大模型要快就得多花钱",
     "groups": [
         {"title": "输出速度（tokens/秒）", "cols": ["模型", "厂商", "t/s"], "rows": SPEED},
         {"title": "首 Token 延迟（秒，越低越好）", "cols": ["模型", "厂商", "秒"], "rows": LAT},
         {"title": "高智能低成本（智能 ≥30，按每任务成本升序）",
-         "cols": ["模型", "厂商", "智能", "成本", "单价 in/out"], "rows": CHEAP},
+         "cols": ["模型", "厂商", "智能", "成本/任务", "单价 in/out"], "rows": CHEAP},
         {"title": "每美元智能指数（越高越划算）",
          "cols": ["模型", "厂商", "分/$", "明细"], "rows": EFF},
     ]

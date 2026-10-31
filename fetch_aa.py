@@ -48,6 +48,53 @@ if not parts:
     sys.exit('ERROR: no RSC payload found — page structure may have changed')
 buf = ''.join(json.loads(p) for p in parts)
 
+# AA 在 2026-10-26 前后把各基准分数从顶层扁平字段搬进了 scores 对象，键名改为 kebab-case。
+# 这里展平回旧字段名，保证 build.py 与历史数据格式一致。
+SCORES_MAP = {
+    'omniscience-accuracy': 'omniscienceAccuracy',
+    'omniscience-non-hallucination': 'omniscienceNonHallucination',
+    'humanitys-last-exam': 'hle',
+    'artificial-analysis-long-context-reasoning': 'lcr',
+    'critpt': 'critpt',
+    'terminalbench-hard': 'terminalbenchHard',
+    'terminalbench-2-1': 'terminalBench21',
+    'terminalbench-4-0': 'terminalBench40',
+    'terminal-bench-science': 'terminalBenchScience',
+    'tau2-bench': 'tau2',
+    'tau3-banking': 'tauBanking',
+    'gpqa-diamond': 'gpqa',
+    'ifbench': 'ifbench',
+    'scicode': 'scicode',
+    'mmmu-pro': 'mmmuPro',
+    'gdpval-aa-normalized': 'gdpvalNormalized',
+    'gdp-pdf': 'gdpPdf',
+    'aa-briefcase': 'aaBriefcase',
+    'automationbench-aa': 'automationBench',
+    'aa-analyst-agent': 'analystAgent',
+    'apex-agents-aa': 'apexAgents',
+    'itbench-aa': 'itbenchSre',
+    'livecodebench': 'livecodebench',
+    'frontiercode': 'frontierCode',
+    'harvey-lab-aa': 'harveyLab',
+    'enterprise-ops-gym-aa': 'enterpriseOpsGym',
+    'code2video-aa': 'code2video',
+    'aa-3d': 'aa3d',
+    'aime-2025': 'aime2025',
+    'mlcr-aa': 'mlcr',
+}
+
+
+def flatten(o):
+    """把 scores 里的 kebab-case 键展平到顶层驼峰字段；顶层已有值不覆盖。"""
+    sc = o.get('scores')
+    if isinstance(sc, dict):
+        for k, v in sc.items():
+            dst = SCORES_MAP.get(k)
+            if dst and o.get(dst) is None:
+                o[dst] = v
+    return o
+
+
 models, i = [], 0
 while True:
     i = buf.find('{"slug":', i)
@@ -70,7 +117,7 @@ while True:
     try:
         o = json.loads(buf[i:j+1])
         if 'name' in o and 'intelligenceIndex' in o:
-            models.append(o)
+            models.append(flatten(o))
     except Exception:
         pass
     i = j + 1
